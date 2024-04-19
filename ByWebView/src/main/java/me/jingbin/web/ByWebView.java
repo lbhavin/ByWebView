@@ -16,6 +16,9 @@ import android.widget.FrameLayout;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 网页可以处理:
  * 点击相应控件：
@@ -42,6 +45,7 @@ public class ByWebView {
     private Activity activity;
     private ByWebChromeClient mWebChromeClient;
     private ByLoadJsHolder byLoadJsHolder;
+    Map<String, String> headers = new HashMap<>();
 
     private ByWebView(Builder builder) {
         this.activity = builder.mActivity;
@@ -51,7 +55,8 @@ public class ByWebView {
         FrameLayout parentLayout = new FrameLayout(activity);
         // 设置WebView
         setWebView(builder.mCustomWebView);
-        parentLayout.addView(mWebView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        parentLayout.addView(mWebView,
+                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         // 进度条布局
         handleWebProgress(builder, parentLayout);
         if (builder.mIndex != -1) {
@@ -158,11 +163,11 @@ public class ByWebView {
                 mProgressBar.setColor(builder.mProgressStartColor, builder.mProgressEndColor);
             } else if (builder.mProgressStartColor != 0) {
                 mProgressBar.setColor(builder.mProgressStartColor, builder.mProgressStartColor);
-            } else if (!TextUtils.isEmpty(builder.mProgressStartColorString)
-                    && !TextUtils.isEmpty(builder.mProgressEndColorString)) {
+            } else if (!TextUtils.isEmpty(builder.mProgressStartColorString) && !TextUtils.isEmpty(
+                    builder.mProgressEndColorString)) {
                 mProgressBar.setColor(builder.mProgressStartColorString, builder.mProgressEndColorString);
-            } else if (!TextUtils.isEmpty(builder.mProgressStartColorString)
-                    && TextUtils.isEmpty(builder.mProgressEndColorString)) {
+            } else if (!TextUtils.isEmpty(builder.mProgressStartColorString) && TextUtils.isEmpty(
+                    builder.mProgressEndColorString)) {
                 mProgressBar.setColor(builder.mProgressStartColorString, builder.mProgressStartColorString);
             }
             int progressHeight = ByWebTools.dip2px(parentLayout.getContext(), WebProgress.WEB_PROGRESS_DEFAULT_HEIGHT);
@@ -171,15 +176,21 @@ public class ByWebView {
                 progressHeight = ByWebTools.dip2px(parentLayout.getContext(), builder.mProgressHeightDp);
             }
             mProgressBar.setVisibility(View.GONE);
-            parentLayout.addView(mProgressBar, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, progressHeight));
+            parentLayout.addView(mProgressBar,
+                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, progressHeight));
         }
     }
 
     public void loadUrl(String url) {
-        if (!TextUtils.isEmpty(url) && url.endsWith("mp4") && Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (!TextUtils.isEmpty(url) && url.endsWith(
+                "mp4") && Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             mWebView.loadData(ByWebTools.getVideoHtmlBody(url), "text/html", "UTF-8");
         } else {
-            mWebView.loadUrl(url);
+            if (headers != null && !headers.isEmpty()) {
+                mWebView.loadUrl(url, headers);
+            } else {
+                mWebView.loadUrl(url);
+            }
         }
         if (mProgressBar != null) {
             mProgressBar.show();
@@ -269,14 +280,16 @@ public class ByWebView {
         try {
             if (mErrorView == null) {
                 FrameLayout parent = (FrameLayout) mWebView.getParent();
-                mErrorView = LayoutInflater.from(parent.getContext()).inflate((mErrorLayoutId == 0) ? R.layout.by_load_url_error : mErrorLayoutId, null);
+                mErrorView = LayoutInflater.from(parent.getContext()).inflate(
+                        (mErrorLayoutId == 0) ? R.layout.by_load_url_error : mErrorLayoutId, null);
                 mErrorView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         reload();
                     }
                 });
-                parent.addView(mErrorView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                parent.addView(mErrorView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
             } else {
                 mErrorView.setVisibility(View.VISIBLE);
             }
@@ -488,6 +501,16 @@ public class ByWebView {
          */
         public ByWebView loadUrl(String url) {
             ByWebView byWebView = get();
+            byWebView.loadUrl(url);
+            return byWebView;
+        }
+
+        /**
+         * loadUrl()并获取ByWebView
+         */
+        public ByWebView loadUrl(String url, Map<String, String> headers) {
+            ByWebView byWebView = get();
+            byWebView.headers = headers;
             byWebView.loadUrl(url);
             return byWebView;
         }

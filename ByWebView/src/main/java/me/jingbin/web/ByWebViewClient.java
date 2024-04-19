@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -48,6 +49,7 @@ public class ByWebViewClient extends WebViewClient {
         if (TextUtils.isEmpty(url)) {
             return false;
         }
+        Log.e("jing", "----url my :shouldOverrideUrlLoading " + url);
         if (onByWebClientCallback != null) {
             return onByWebClientCallback.isOpenThirdApp(url);
         } else {
