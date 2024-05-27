@@ -54,6 +54,7 @@
                 android:hint="@string/string_hit"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
+                android:text="https://tdr-dev.cricheroes.in"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textSize="15sp" />

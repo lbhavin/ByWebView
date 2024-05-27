@@ -139,7 +139,7 @@ public class ByWebView {
             ws.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         }
         // WebView是否新窗口打开(加了后可能打不开网页)
-//        ws.setSupportMultipleWindows(true);
+        ws.setSupportMultipleWindows(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // WebView从5.0开始默认不允许混合模式,https中不能加载http资源,需要设置开启。

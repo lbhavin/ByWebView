@@ -8,12 +8,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
@@ -26,11 +26,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.example.jingbin.webviewstudy.BuildConfig;
 import com.example.jingbin.webviewstudy.MainActivity;
 import com.example.jingbin.webviewstudy.R;
 import com.example.jingbin.webviewstudy.config.MyJavascriptInterface;
 import com.example.jingbin.webviewstudy.utils.StatusBarUtil;
 import com.example.jingbin.webviewstudy.utils.WebTools;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import me.jingbin.web.ByWebTools;
 import me.jingbin.web.ByWebView;
@@ -63,6 +67,7 @@ public class ByWebViewActivity extends AppCompatActivity {
     private WebView webView;
     private ByWebView byWebView;
     private TextView tvGunTitle;
+    Map<String, String> headers = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +88,7 @@ public class ByWebViewActivity extends AppCompatActivity {
         StatusBarUtil.setColor(this, ContextCompat.getColor(this, R.color.colorPrimary), 0);
         initToolBar();
         LinearLayout container = findViewById(R.id.ll_container);
+        setHeaders();
         byWebView = ByWebView
                 .with(this)
                 .setWebParent(container, new LinearLayout.LayoutParams(-1, -1))
@@ -90,8 +96,32 @@ public class ByWebViewActivity extends AppCompatActivity {
                 .setOnTitleProgressCallback(onTitleProgressCallback)
                 .setOnByWebClientCallback(onByWebClientCallback)
                 .addJavascriptInterface("injectedObject", new MyJavascriptInterface(this))
-                .loadUrl(mUrl);
+                .loadUrl(mUrl,headers);
         webView = byWebView.getWebView();
+    }
+
+
+    private void setHeaders() {
+        String manufacturer = (BuildConfig.DEBUG) ? "samsung" : Build.MANUFACTURER;
+        String model = (BuildConfig.DEBUG) ? "SM-M305F" : Build.MODEL;
+        headers.put("api-key", "b2236bde3ffbe7b27f425ae889ca1e08");
+        headers.put("user-agent",  BuildConfig.VERSION_NAME);
+        headers.put("device-type", "android");
+        headers.put("device-info", "Manufacturer:" + manufacturer + ", Model:" + model);
+        headers.put("app-mode", "dev");
+        headers.put("app-version", BuildConfig.VERSION_NAME);
+        headers.put("app-version-code", "356");
+        headers.put("android-version", "11.0.4");
+        headers.put("app-name","cricheroes");
+        headers.put("udid", "8f0ab8240d754086");
+//        if (!CricHeroes.getApp().isGuestUser()) {
+            headers.put("authorization", "f46185c0-19bd-11ef-9e71-b1f1ddd6191c");
+            try {
+                headers.put("670759FA7E12C18E695C22D927EE1208", "14F61734A1FB963159FB95A5A8525F13");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//        }
     }
 
     private void initToolBar() {

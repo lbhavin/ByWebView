@@ -22,7 +22,9 @@ import android.webkit.JsResult;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
@@ -145,7 +147,8 @@ public class ByWebChromeClient extends WebChromeClient {
     @Override
     public View getVideoLoadingProgressView() {
         if (mProgressVideo == null) {
-            mProgressVideo = LayoutInflater.from(mByWebView.getWebView().getContext()).inflate(R.layout.by_video_loading_progress, null);
+            mProgressVideo = LayoutInflater.from(mByWebView.getWebView().getContext()).inflate(
+                    R.layout.by_video_loading_progress, null);
         }
         return mProgressVideo;
     }
@@ -158,10 +161,7 @@ public class ByWebChromeClient extends WebChromeClient {
             mByWebView.getProgressBar().setWebProgress(newProgress);
         }
         // 当显示错误页面时，进度达到100才显示网页
-        if (mByWebView.getWebView() != null
-                && mByWebView.getWebView().getVisibility() == View.INVISIBLE
-                && (mByWebView.getErrorView() == null || mByWebView.getErrorView().getVisibility() == View.GONE)
-                && newProgress == 100) {
+        if (mByWebView.getWebView() != null && mByWebView.getWebView().getVisibility() == View.INVISIBLE && (mByWebView.getErrorView() == null || mByWebView.getErrorView().getVisibility() == View.GONE) && newProgress == 100) {
             mByWebView.getWebView().setVisibility(View.VISIBLE);
         }
         if (onByWebChromeCallback != null) {
@@ -182,7 +182,8 @@ public class ByWebChromeClient extends WebChromeClient {
         // 设置title
         if (onByWebChromeCallback != null) {
             if (mByWebView.getErrorView() != null && mByWebView.getErrorView().getVisibility() == View.VISIBLE) {
-                onByWebChromeCallback.onReceivedTitle(TextUtils.isEmpty(mByWebView.getErrorTitle()) ? "网页无法打开" : mByWebView.getErrorTitle());
+                onByWebChromeCallback.onReceivedTitle(
+                        TextUtils.isEmpty(mByWebView.getErrorTitle()) ? "网页无法打开" : mByWebView.getErrorTitle());
             } else {
                 onByWebChromeCallback.onReceivedTitle(title);
             }
@@ -194,17 +195,14 @@ public class ByWebChromeClient extends WebChromeClient {
         if (onByWebChromeCallback != null && onByWebChromeCallback.onJsAlert(view, url, message, result)) {
             return true;
         }
-        Dialog alertDialog = new AlertDialog.Builder(view.getContext()).
-                setMessage(message).
-                setCancelable(false).
-                setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        result.confirm();
-                    }
-                })
-                .create();
+        Dialog alertDialog = new AlertDialog.Builder(view.getContext()).setMessage(message).setCancelable(
+                false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                result.confirm();
+            }
+        }).create();
         alertDialog.show();
         return true;
     }
@@ -224,17 +222,16 @@ public class ByWebChromeClient extends WebChromeClient {
                 }
             }
         };
-        new AlertDialog.Builder(view.getContext())
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, listener)
-                .setNegativeButton(android.R.string.cancel, listener).show();
+        new AlertDialog.Builder(view.getContext()).setMessage(message).setCancelable(false).setPositiveButton(
+                android.R.string.ok, listener).setNegativeButton(android.R.string.cancel, listener).show();
         return true;
     }
 
     @Override
-    public boolean onJsPrompt(final WebView view, String url, final String message, final String defaultValue, final JsPromptResult result) {
-        if (onByWebChromeCallback != null && onByWebChromeCallback.onJsPrompt(view, url, message, defaultValue, result)) {
+    public boolean onJsPrompt(final WebView view, String url, final String message, final String defaultValue,
+            final JsPromptResult result) {
+        if (onByWebChromeCallback != null && onByWebChromeCallback.onJsPrompt(view, url, message, defaultValue,
+                result)) {
             return true;
         }
         view.post(new Runnable() {
@@ -256,16 +253,11 @@ public class ByWebChromeClient extends WebChromeClient {
                         }
                     }
                 };
-                new AlertDialog.Builder(view.getContext())
-                        .setTitle(message)
-                        .setView(editText)
-                        .setCancelable(false)
-                        .setPositiveButton(android.R.string.ok, listener)
-                        .setNegativeButton(android.R.string.cancel, listener)
-                        .show();
+                new AlertDialog.Builder(view.getContext()).setTitle(message).setView(editText).setCancelable(
+                        false).setPositiveButton(android.R.string.ok, listener).setNegativeButton(
+                        android.R.string.cancel, listener).show();
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 int t = (int) (dpi * 16);
                 layoutParams.setMargins(t, 0, t, 0);
                 layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
@@ -294,7 +286,8 @@ public class ByWebChromeClient extends WebChromeClient {
 
     // For Android > 5.0
     @Override
-    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> uploadMsg, FileChooserParams fileChooserParams) {
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> uploadMsg,
+            FileChooserParams fileChooserParams) {
         openFileChooserImplForAndroid5(uploadMsg);
         return true;
     }
@@ -386,4 +379,34 @@ public class ByWebChromeClient extends WebChromeClient {
             return super.getDefaultVideoPoster();
         }
     }
+
+        @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+        WebView newWebView = new WebView(view.getContext());
+        newWebView.getSettings().setJavaScriptEnabled(true);
+        newWebView.getSettings().setSupportZoom(true);
+        newWebView.getSettings().setBuiltInZoomControls(true);
+        newWebView.getSettings().setPluginState(WebSettings.PluginState.ON);
+        newWebView.getSettings().setSupportMultipleWindows(true);
+        mByWebView.getWebView().addView(newWebView);
+        WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+        transport.setWebView(newWebView);
+        resultMsg.sendToTarget();
+
+        newWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                mByWebView.getWebView().removeView(newWebView);
+                return true;
+            }
+        });
+
+        return true;
+    }
+//    @Override
+//    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+//         Handle new window creation here, e.g., create a new WebView instance
+//        return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
+//    }
 }
